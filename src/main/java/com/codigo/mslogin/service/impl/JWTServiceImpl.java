@@ -1,5 +1,6 @@
 package com.codigo.mslogin.service.impl;
 
+import com.codigo.mslogin.service.JWTService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -9,13 +10,13 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
-import java.util.Base64;
 import java.util.Date;
 import java.util.function.Function;
 
 @Service
-public class JWTServiceImpl {
+public class JWTServiceImpl implements JWTService {
 
+    @Override
     public String generateToken(UserDetails userDetails){
        return Jwts.builder().setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
@@ -25,6 +26,7 @@ public class JWTServiceImpl {
 
     }
 
+    @Override
     public String extractUserName(String token){
         return extractClaims(token, Claims::getSubject);
     }
@@ -42,6 +44,7 @@ public class JWTServiceImpl {
         byte[] key = Decoders.BASE64.decode("85732b878c0f544da4a863804775ef3914e8ccb82b08820a278302c5b826e291");
         return Keys.hmacShaKeyFor(key);
     }
+    @Override
     public boolean validateToken(String token, UserDetails userDetails){
         final String username = extractUserName(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
