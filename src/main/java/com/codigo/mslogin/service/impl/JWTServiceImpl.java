@@ -25,7 +25,11 @@ public class JWTServiceImpl implements JWTService {
                 .compact();
 
     }
-
+    @Override
+    public boolean validateToken(String token, UserDetails userDetails){
+        final String username = extractUserName(token);
+        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+    }
     @Override
     public String extractUserName(String token){
         return extractClaims(token, Claims::getSubject);
@@ -43,11 +47,6 @@ public class JWTServiceImpl implements JWTService {
     private Key getSignKey(){
         byte[] key = Decoders.BASE64.decode("85732b878c0f544da4a863804775ef3914e8ccb82b08820a278302c5b826e291");
         return Keys.hmacShaKeyFor(key);
-    }
-    @Override
-    public boolean validateToken(String token, UserDetails userDetails){
-        final String username = extractUserName(token);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 
     private boolean isTokenExpired(String token){
